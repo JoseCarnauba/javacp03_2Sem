@@ -1,17 +1,19 @@
 package br.com.fiap.cp03.config;
 
+import br.com.fiap.cp03.service.UsuarioService;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+@Configuration
 public class SecurityConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder()
-    {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -19,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/public/**", "/login", "/webjars/**", "/css/**").permitAll() // Acesso público para login e recursos estáticos
+                        .requestMatchers("/public/**", "/login", "/cadastro", "/webjars/**", "/css/**").permitAll() // Acesso público para login e recursos estáticos
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Restringe o acesso para ADMIN nas rotas /admin
                         .requestMatchers("/aluno/**").hasRole("ALUNO") // Restringe o acesso para ALUNO nas rotas /aluno
                         .anyRequest().authenticated() // Exige autenticação para qualquer outra rota
@@ -36,8 +38,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-
-        return null;
+    public UserDetailsService userDetailsService(UsuarioService usuarioService) {
+        // Carrega o usuário usando o UsuarioService sem criar dependência circular
+        return usuarioService::loadUserByUsername;
     }
 }

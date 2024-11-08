@@ -11,16 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/login")
 public class UsuarioController {
 
         private final UsuarioService usuarioService;
 
-        public UsuarioController(UsuarioService usuarioService) {
+        public UsuarioController(UsuarioService usuarioService)
+        {
             this.usuarioService = usuarioService;
         }
 
-        @PostMapping("/register")
+        @PostMapping("/cadastrar")
         public ResponseEntity<Usuario> registrarUsuario(@RequestBody @Valid FormLogin userForm) {
             // Converte o UserForm em uma entidade User e salva
             Usuario usuario = usuarioService.registrarUsuario(userForm);

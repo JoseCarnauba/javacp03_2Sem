@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Set;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "T_USUARIOS")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,15 +27,26 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
-    private Set<String> roles;
+    @ManyToMany(fetch = FetchType.EAGER) // Relacionamento Many-to-Many com Role
+    @JoinTable(
+            name = "usuario_roles",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles; // Agora é um Set de Role
+
+    public Usuario(String username, String password, Set<Role> roles) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+    }
 
     // Implementação dos métodos da interface UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> (GrantedAuthority) () -> role).toList();
+        return roles.stream()
+                .map(role -> (GrantedAuthority) () -> role.getName()) // Usando o nome da role
+                .toList();
     }
 
     @Override
